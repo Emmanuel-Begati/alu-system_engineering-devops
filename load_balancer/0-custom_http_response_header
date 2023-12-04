@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Update package list
+sudo apt-get update
+
+# Install Nginx
+sudo apt-get install -y nginx
+
+# Get the current hostname
+hostname=$(hostname)
+
+# Create a custom Nginx configuration file with X-Served-By header
+sudo tee /etc/nginx/conf.d/custom_headers.conf > /dev/null <<'EOF'
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location / {
+        add_header X-Served-By $hostname;
+        # Additional configuration if needed
+    }
+}
+EOF
+
+# Remove the default Nginx default site configuration
+sudo rm /etc/nginx/sites-enabled/default
+
+# Restart Nginx to apply changes
+sudo systemctl restart nginx
